@@ -278,16 +278,37 @@ def inject_css():
         <style>
         :root { --navy:#172033; --red:#b52a28; --coral:#e4574f; --cream:#fff5ef;
                 --ink:#151a24; --muted:#667085; --green:#18794e; }
-        .stApp { background:#fffdfb; }
+        .stApp { background:#fffdfb; color:#151a24; }
         [data-testid="stSidebar"] { background:#172033; }
         [data-testid="stSidebar"] * { color:#ffffff; }
         [data-testid="stSidebar"] .stProgress > div > div { background:#ff7566; }
+        /* Keep ordinary main-page copy readable on the cream background. */
+        [data-testid="stMain"],
+        [data-testid="stMain"] p,
+        [data-testid="stMain"] li,
+        [data-testid="stMain"] span,
+        [data-testid="stMain"] label,
+        [data-testid="stMain"] strong,
+        [data-testid="stMain"] b,
+        [data-testid="stMain"] small,
+        [data-testid="stMain"] div[data-testid="stMarkdownContainer"] {
+          color:#151a24;
+        }
         [data-testid="stMain"] [role="radiogroup"] label p,
         [data-testid="stMain"] [data-testid="stCheckbox"] label p,
         [data-testid="stMain"] [data-testid="stWidgetLabel"] p { color:#111111 !important; }
-        [data-testid="stMain"] .stAlert p { color:#111111 !important; }
+        [data-testid="stMain"] [data-testid="stCaptionContainer"],
+        [data-testid="stMain"] [data-testid="stCaptionContainer"] p { color:#525866 !important; }
+        [data-testid="stMain"] .stAlert,
+        [data-testid="stMain"] .stAlert p,
+        [data-testid="stMain"] [data-testid="stNotification"],
+        [data-testid="stMain"] [data-testid="stNotification"] p { color:#111111 !important; }
         [data-testid="stMain"] h1, [data-testid="stMain"] h2,
         [data-testid="stMain"] h3 { color:#172033 !important; }
+        [data-testid="stMain"] [data-testid="stMetricLabel"] p,
+        [data-testid="stMain"] [data-testid="stMetricValue"] {
+          color:#172033 !important;
+        }
         .hero { padding:2rem 2.2rem; border-radius:22px; color:#111111;
           background:linear-gradient(135deg,#fff0e9,#ffe0d6 58%,#fff6f2);
           border:2px solid #e4574f;
@@ -298,7 +319,8 @@ def inject_css():
         .lesson-card { background:white; border:1px solid #e7e2de; border-radius:18px;
           padding:1.25rem 1.4rem; box-shadow:0 7px 20px rgba(23,32,51,.05); margin-bottom:1rem; }
         .definition { background:#fff1eb; border-left:6px solid #e4574f; }
-        .definition p, .slide-info p, .slide-info li, .activity-card p { color:#111 !important; }
+        .definition p, .slide-info p, .slide-info li, .activity-card p,
+        .timeline-row, .timeline-row b { color:#111 !important; }
         .slide-info { background:#f5f6f8; border-left:6px solid #172033; }
         .activity-card { background:#fff; border:2px solid #e4574f; }
         .activity-card h3 { color:#a62220 !important; font-size:1.55rem !important; }
@@ -309,8 +331,32 @@ def inject_css():
         .feedback-bad { border-left:5px solid #c9362b;background:#fff1ef;padding:1rem;border-radius:10px;color:#111; }
         .timeline-row { border-left:3px solid #e4574f; padding:.25rem 0 .8rem 1rem; color:#111; }
         .certificate { border:8px double #b52a28;background:#fffaf2;padding:2rem;text-align:center;color:#111; }
-        .certificate h2 { color:#172033; }
-        div.stButton > button { border-radius:999px; font-weight:750; }
+        .certificate h2 { color:#172033 !important; }
+        .certificate p, .certificate b { color:#111 !important; }
+        div.stButton > button,
+        div.stDownloadButton > button,
+        [data-testid="stFormSubmitButton"] > button {
+          border-radius:999px;
+          border:1px solid #9f2422;
+          background:#b52a28;
+          color:#ffffff !important;
+          font-weight:750;
+        }
+        div.stButton > button p,
+        div.stDownloadButton > button p,
+        [data-testid="stFormSubmitButton"] > button p { color:#ffffff !important; }
+        div.stButton > button:hover,
+        div.stDownloadButton > button:hover,
+        [data-testid="stFormSubmitButton"] > button:hover {
+          background:#8f1f1d;
+          border-color:#8f1f1d;
+          color:#ffffff !important;
+        }
+        [data-testid="stMain"] input,
+        [data-testid="stMain"] textarea {
+          color:#111111 !important;
+          background:#ffffff !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
