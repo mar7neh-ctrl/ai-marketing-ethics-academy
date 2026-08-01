@@ -18,6 +18,18 @@ BASE_DIR = Path(__file__).resolve().parent
 RISKY_AD_PATH = BASE_DIR / "assets" / "risky_skincare_ad.png"
 SITE_TITLE = "AI POLICY, ETHICS, GOVERNANCE, AND RISK IN MARKETING ANALYTICS"
 
+HEADER_IMAGES = {
+    name: BASE_DIR / "assets" / f"module_{index:02d}_header.png"
+    for index, name in enumerate([
+        "1. AI Governance", "2. Bias & Discrimination",
+        "3. Manipulation & Dark Patterns", "4. Privacy & Consent",
+        "5. Intellectual Property (IP)", "6. Disclosure & Transparency",
+        "7. Hallucinated Claims", "8. Case Study: Anthropic Claude Mythos & Fable 5",
+        "9. Brand Safety", "10. Model Monitoring", "11. Agent Governance",
+        "12. AI Policy & Regulation",
+    ], start=1)
+}
+
 
 def option(correct, revenue, trust, risk, readiness, feedback):
     return {
@@ -40,11 +52,11 @@ MODULES = {
             "Compliance & Regulation",
         ],
         "activity_title": "Build the governance foundation",
-        "prompt": "NovaGlow wants to use AI for content creation, customer targeting, and automatic publishing. Which governance foundation should leadership approve?",
+        "prompt": "NovaGlow wants AI to write ads, choose customers, and publish posts. What should the company do first?",
         "options": {
-            "Let each marketing employee decide when AI is appropriate": option(False, 15000, -12, 24, -18, "Individual judgment alone does not create consistent policies, controls, documentation, or accountability."),
-            "Create policies, data controls, risk reviews, human approval, documentation, and compliance checks": option(True, 6000, 16, -16, 22, "Correct. This connects the frameworks, policies, controls, and human oversight described in AI governance."),
-            "Use AI freely until a customer complains": option(False, 22000, -20, 34, -24, "Waiting for harm is reactive. Governance must define responsibilities and controls before deployment."),
+            "Let each employee make their own rules": option(False, 15000, -12, 24, -18, "Individual judgment alone does not create consistent policies, controls, documentation, or accountability."),
+            "Create clear rules, reviews, records, and human approval": option(True, 6000, 16, -16, 22, "Correct. This connects the frameworks, policies, controls, and human oversight described in AI governance."),
+            "Use the AI until someone complains": option(False, 22000, -20, 34, -24, "Waiting for harm is reactive. Governance must define responsibilities and controls before deployment."),
         },
     },
     "2. Bias & Discrimination": {
@@ -53,11 +65,11 @@ MODULES = {
         "slide_text": "An AI advertising system learns from past campaigns and primarily shows high-paying job ads to men because historical data reflects more male applicants.",
         "slide_items": ["Use diverse datasets, regularly audit models for bias, and include human oversight to reduce bias & discrimination."],
         "activity_title": "Audit the targeting model",
-        "prompt": "A recruiting campaign predicts higher clicks from men and begins limiting high-paying job ads to male audiences. What should the team do?",
+        "prompt": "The AI mostly shows high-paying job ads to men. What should the company do?",
         "options": {
-            "Keep the targeting because it maximizes clicks": option(False, 19000, -20, 32, -22, "Historical performance can reproduce discrimination. Higher clicks do not make unequal access fair."),
-            "Expand the audience, test outcomes across groups, audit the data, and require human review": option(True, 8000, 16, -15, 21, "Correct. Diverse data, bias auditing, and human oversight reduce the chance of unfair marketing outcomes."),
-            "Remove gender but continue using strongly correlated proxy variables without testing": option(False, 13000, -12, 22, -12, "Removing one field does not prevent proxy discrimination. The team must test actual outcomes."),
+            "Keep it because men click more": option(False, 19000, -20, 32, -22, "Historical performance can reproduce discrimination. Higher clicks do not make unequal access fair."),
+            "Show the ads more widely and test whether the results are fair": option(True, 8000, 16, -15, 21, "Correct. Diverse data, bias auditing, and human oversight reduce the chance of unfair marketing outcomes."),
+            "Remove the word gender but do no other testing": option(False, 13000, -12, 22, -12, "Removing one field does not prevent proxy discrimination. The team must test actual outcomes."),
         },
     },
     "3. Manipulation & Dark Patterns": {
@@ -65,11 +77,11 @@ MODULES = {
         "slide_title": "Key Ideas",
         "slide_text": "Note all the callouts, extreme ‘deals’, urgency indicators that could influence someone to make a purchase they might not otherwise using misleading/false data.",
         "activity_title": "Redesign the checkout trap",
-        "prompt": "The checkout page uses a fake countdown, a bright Accept button, a hidden Decline link, and ‘Only 3 left’ when inventory is unlimited. What should replace it?",
+        "prompt": "A checkout page uses a fake countdown and hides the No button. What should the company do?",
         "options": {
             "Keep the screen because urgency increases conversions": option(False, 18000, -18, 28, -20, "Conversion does not justify misleading urgency or interface choices designed to steer users."),
-            "Use truthful inventory, equal choices, plain language, and no preselected options": option(True, 5000, 18, -16, 20, "Correct. The redesign allows a voluntary choice without false urgency or visual manipulation."),
-            "Keep the fake countdown but add a terms-and-conditions link": option(False, 13000, -13, 22, -12, "A buried link does not correct false information or manipulative design."),
+            "Show honest information and make Yes and No equally easy": option(True, 5000, 18, -16, 20, "Correct. The redesign allows a voluntary choice without false urgency or visual manipulation."),
+            "Keep the fake countdown but add a small rules link": option(False, 13000, -13, 22, -12, "A buried link does not correct false information or manipulative design."),
         },
     },
     "4. Privacy & Consent": {
@@ -82,11 +94,11 @@ MODULES = {
             "Strong AI governance balances personalization with privacy!",
         ],
         "activity_title": "Choose a responsible personalization plan",
-        "prompt": "The marketing model wants browsing history, purchases, precise location, health interests, and inferred pregnancy status. Which approach should be approved?",
+        "prompt": "The AI wants to use browsing, purchases, location, and health information for ads. What should the company do?",
         "options": {
-            "Collect every available signal because personalization benefits customers": option(False, 21000, -21, 35, -23, "Personalization does not remove the need for purpose limits, data minimization, and clear informed consent."),
-            "Use only necessary data for a stated purpose after clear consent and provide withdrawal controls": option(True, 7000, 19, -18, 22, "Correct. The approach balances useful personalization with privacy, consent, and customer trust."),
-            "Collect everything now and ask permission after the campaign": option(False, 17000, -19, 31, -20, "Consent must come before the data is used, not after the campaign has already launched."),
+            "Use all the data because the ads will be more personal": option(False, 21000, -21, 35, -23, "Personalization does not remove the need for purpose limits, data minimization, and clear informed consent."),
+            "Ask permission and use only the data the campaign truly needs": option(True, 7000, 19, -18, 22, "Correct. The approach balances useful personalization with privacy, consent, and customer trust."),
+            "Use the data now and ask permission later": option(False, 17000, -19, 31, -20, "Consent must come before the data is used, not after the campaign has already launched."),
         },
     },
     "5. Intellectual Property (IP)": {
@@ -100,11 +112,11 @@ MODULES = {
             "Legal & brand protection",
         ],
         "activity_title": "Clear the campaign assets",
-        "prompt": "The campaign includes a licensed stock photo, copied article text, an AI image resembling a famous character, and a testimonial used without permission. What should the team publish?",
+        "prompt": "An ad uses copied writing, a famous character, and a customer quote without permission. What should the team do?",
         "options": {
             "Publish everything because AI transformed the material": option(False, 17000, -13, 32, -20, "AI transformation does not automatically create permission or ownership."),
-            "Use only cleared assets and retain the source, license, release, prompt, model, reviewer, and approval date": option(True, 5000, 14, -17, 23, "Correct. Rights clearance and human creative oversight protect the company legally and support an auditable record."),
-            "Label every asset AI-generated and publish it": option(False, 10000, -7, 22, -10, "Disclosure does not replace copyright permission, licenses, ownership, or customer releases."),
+            "Use only approved material and save proof of permission": option(True, 5000, 14, -17, 23, "Correct. Rights clearance and human creative oversight protect the company legally and support an auditable record."),
+            "Write AI-generated under everything and publish it": option(False, 10000, -7, 22, -10, "Disclosure does not replace copyright permission, licenses, ownership, or customer releases."),
         },
     },
     "6. Disclosure & Transparency": {
@@ -119,10 +131,10 @@ MODULES = {
             "Policy compliance",
         ],
         "activity_title": "Make the AI disclosure clear",
-        "prompt": "An AI-generated influencer and recommendation model are used in an advertisement. Which disclosure is strongest?",
+        "prompt": "An ad uses a fake AI influencer and an AI recommendation. What should customers be told?",
         "options": {
             "Put ‘AI may be used’ at the bottom of a 20-page privacy policy": option(False, 14000, -13, 23, -16, "A buried and vague statement is not clear and conspicuous."),
-            "Place a clear label beside the content and explain that AI created the person and influenced the recommendation": option(True, 5000, 17, -14, 20, "Correct. This tells people AI is being used and explains how it influenced the marketing content."),
+            "Put a clear label beside the ad explaining exactly what AI did": option(True, 5000, 17, -14, 20, "Correct. This tells people AI is being used and explains how it influenced the marketing content."),
             "Do not disclose because the product itself is real": option(False, 18000, -18, 29, -21, "The reality of the product does not remove the need to disclose synthetic people or AI-influenced recommendations."),
         },
     },
@@ -138,10 +150,10 @@ MODULES = {
             "Continuous model monitoring",
         ],
         "activity_title": "Verify the suspicious skincare ad",
-        "prompt": "The AI writes: ‘Erase every blemish in 48 hours. Clinically proven for every skin type. Dermatologists call it a miracle.’ What should happen next?",
+        "prompt": "The AI says a skincare product works in 48 hours, but nobody checked the claim. What should happen?",
         "options": {
             "Publish immediately because the wording sounds confident": option(False, 20000, -20, 34, -23, "Confidence is not evidence. The claims may be fabricated and could mislead customers and decision-makers."),
-            "Pause, verify every claim against evidence, rewrite unsupported language, and require human approval": option(True, 5000, 16, -17, 22, "Correct. Human review and continuous monitoring are needed because AI can present false information as fact."),
+            "Stop and check every claim before a person approves the ad": option(True, 5000, 16, -17, 22, "Correct. Human review and continuous monitoring are needed because AI can present false information as fact."),
             "Remove only the word ‘miracle’ and publish the remaining claims": option(False, 12000, -10, 22, -11, "The 48-hour and universal clinical claims still require evidence."),
         },
     },
@@ -160,11 +172,11 @@ MODULES = {
             "PEOPLE REMAIN RESPONSIBLE — Marketing, legal, data, and security teams must share clear roles.",
         ],
         "activity_title": "Set the frontier-model controls",
-        "prompt": "A powerful model can perform high-risk cyber tasks. Which deployment approach best applies the lessons from the case?",
+        "prompt": "A powerful AI can perform dangerous cyber tasks. Who should be allowed to use it?",
         "options": {
             "Release the unrestricted model publicly and respond if misuse occurs": option(False, 28000, -22, 42, -27, "Reactive governance is weak when capability is high and safeguards may be bypassed."),
-            "Use risk-tiered access, identity checks, approved uses, safeguards, monitoring, pause procedures, and shared responsibility": option(True, 4000, 19, -20, 25, "Correct. This governs capability, access, safeguards, monitoring, and accountability together."),
-            "Allow customers to choose whether they want safeguards": option(False, 18000, -15, 31, -18, "Customer preference cannot replace provider responsibility for high-risk capability."),
+            "Only approved users, with identity checks, safety rules, monitoring, and a stop process": option(True, 4000, 19, -20, 25, "Correct. This governs capability, access, safeguards, monitoring, and accountability together."),
+            "Let each customer choose whether to use safety rules": option(False, 18000, -15, 31, -18, "Customer preference cannot replace provider responsibility for high-risk capability."),
         },
     },
     "9. Brand Safety": {
@@ -177,10 +189,10 @@ MODULES = {
             "Failing to properly use AI could result in negatively impact their reputation",
         ],
         "activity_title": "Protect the customer experience",
-        "prompt": "The AI customer-service bot gives an insensitive response during a product complaint and refuses to transfer the customer to a person. What should the company do?",
+        "prompt": "A customer is upset, but the AI bot gives a rude answer and will not connect them to a person. What should happen?",
         "options": {
             "Keep the bot active because it reduces service costs": option(False, 16000, -25, 28, -20, "Cost savings do not offset inappropriate content, poor customer experience, and reputational harm."),
-            "Escalate to a human, correct the response, pause the harmful workflow, review logs, and update safeguards": option(True, 3000, 21, -18, 22, "Correct. Brand safety requires accurate and appropriate interactions plus a responsible balance of AI and human support."),
+            "Connect the customer to a person, pause the bot, and fix the problem": option(True, 3000, 21, -18, 22, "Correct. Brand safety requires accurate and appropriate interactions plus a responsible balance of AI and human support."),
             "Delete the customer's complaint from the dashboard": option(False, 9000, -22, 35, -23, "Removing evidence hides the warning signal and makes accountability and monitoring weaker."),
         },
     },
@@ -193,10 +205,10 @@ MODULES = {
             "Track performance",
         ],
         "activity_title": "Respond to the model shift",
-        "prompt": "After an update, conversion rises 18%, while false-claim flags and demographic complaint rates triple. What should happen first?",
+        "prompt": "After an AI update, sales rise, but false claims and customer complaints triple. What should the company do?",
         "options": {
             "Keep running because the campaign is more profitable": option(False, 26000, -24, 39, -26, "Profit monitoring alone misses accuracy, fairness, customer-data, and brand risks."),
-            "Pause affected automation, preserve logs, investigate drift and anomalies, and roll back if safeguards degraded": option(True, -2000, 20, -21, 25, "Correct. Monitoring must connect performance, drift, anomalies, complaints, and accuracy to action."),
+            "Pause the AI, save the records, find the problem, and undo the update if needed": option(True, -2000, 20, -21, 25, "Correct. Monitoring must connect performance, drift, anomalies, complaints, and accuracy to action."),
             "Ask the model whether its own update is safe": option(False, 9000, -14, 27, -15, "Independent testing and accountable human review are still required."),
         },
     },
@@ -210,10 +222,10 @@ MODULES = {
             "Require new governance because they act independently.",
         ],
         "activity_title": "Decide who can press Publish",
-        "prompt": "An AI agent can create copy, select an audience, set the budget, and publish campaigns automatically. Which control system is strongest?",
+        "prompt": "An AI agent can write, choose customers, spend money, and publish by itself. What rules should it have?",
         "options": {
             "Let the agent publish anything under $25,000": option(False, 21000, -18, 31, -22, "A spending threshold does not control claims, privacy, targeting, or brand risk."),
-            "Define authority limits, require risk-based human approvals, keep action logs, monitor outcomes, and provide a kill switch": option(True, 6000, 18, -18, 24, "Correct. Agents that act independently require clear authority, oversight, auditability, monitoring, and shutdown controls."),
+            "Set clear limits, require human approval, save its actions, and add an emergency stop": option(True, 6000, 18, -18, 24, "Correct. Agents that act independently require clear authority, oversight, auditability, monitoring, and shutdown controls."),
             "Review a random 5% of campaigns after publication": option(False, 13000, -9, 22, -10, "Sampling can support monitoring, but post-publication review alone cannot prevent high-impact harm."),
         },
     },
@@ -231,11 +243,11 @@ MODULES = {
             "Responsible AI will become a core business practice, not just a legal requirement.",
         ],
         "activity_title": "Approve the company AI policy",
-        "prompt": "Which policy is most prepared for evolving regulation and responsible AI practice?",
+        "prompt": "Which company rule would best protect customers when employees use AI?",
         "options": {
             "Use one general rule: employees should use AI carefully": option(False, 12000, -10, 22, -17, "A vague statement does not assign responsibility, define risk levels, or create testing and monitoring requirements."),
-            "Create risk-based rules, testing, access limits, privacy and bias controls, disclosures, continuous monitoring, incident response, and named human accountability": option(True, 5000, 19, -19, 25, "Correct. This addresses the development, deployment, oversight, and changing risks of AI systems."),
-            "Wait until every U.S. law is finalized before creating a policy": option(False, 16000, -15, 29, -21, "Organizations still need responsible internal rules while legislation evolves."),
+            "Create stronger rules for riskier AI, test it, monitor it, and name the people responsible": option(True, 5000, 19, -19, 25, "Correct. This addresses the development, deployment, oversight, and changing risks of AI systems."),
+            "Wait for every U.S. law to be finished before making rules": option(False, 16000, -15, 29, -21, "Organizations still need responsible internal rules while legislation evolves."),
         },
     },
 }
@@ -253,6 +265,7 @@ def init_state():
         "readiness": BASELINE["readiness"],
         "final_audit": None,
         "student_name": "",
+        "current_page": "Home",
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -273,20 +286,25 @@ def inject_css():
         [data-testid="stMain"] [data-testid="stCheckbox"] label p,
         [data-testid="stMain"] [data-testid="stWidgetLabel"] p { color:#111111 !important; }
         [data-testid="stMain"] .stAlert p { color:#111111 !important; }
-        .hero { padding:2rem 2.2rem; border-radius:22px; color:white;
-          background:linear-gradient(135deg,#8f201f,#c53732 58%,#8c2423);
+        [data-testid="stMain"] h1, [data-testid="stMain"] h2,
+        [data-testid="stMain"] h3 { color:#172033 !important; }
+        .hero { padding:2rem 2.2rem; border-radius:22px; color:#111111;
+          background:linear-gradient(135deg,#fff0e9,#ffe0d6 58%,#fff6f2);
+          border:2px solid #e4574f;
           box-shadow:0 16px 38px rgba(90,20,20,.18); }
-        .hero h1 { color:white; font-size:2.35rem; line-height:1.12; margin:.4rem 0 .7rem; }
-        .hero p { color:#fff4f1; font-size:1.03rem; max-width:900px; }
-        .eyebrow { color:#ffd45b; letter-spacing:.12em; font-size:.78rem; font-weight:800; }
+        .hero h1 { color:#a62220 !important; font-size:2.35rem; line-height:1.12; margin:.4rem 0 .7rem; }
+        .hero p { color:#111111 !important; font-size:1.03rem; max-width:900px; }
+        .eyebrow { color:#b52a28; letter-spacing:.12em; font-size:.78rem; font-weight:800; }
         .lesson-card { background:white; border:1px solid #e7e2de; border-radius:18px;
           padding:1.25rem 1.4rem; box-shadow:0 7px 20px rgba(23,32,51,.05); margin-bottom:1rem; }
         .definition { background:#fff1eb; border-left:6px solid #e4574f; }
         .definition p, .slide-info p, .slide-info li, .activity-card p { color:#111 !important; }
         .slide-info { background:#f5f6f8; border-left:6px solid #172033; }
         .activity-card { background:#fff; border:2px solid #e4574f; }
+        .activity-card h3 { color:#a62220 !important; font-size:1.55rem !important; }
         .section-label { color:#b52a28; font-size:.78rem; letter-spacing:.1em; font-weight:850; }
-        .topic-title { font-size:2.1rem; color:#172033; margin:.15rem 0 .7rem; }
+        .topic-title { font-size:2.1rem; color:#a62220 !important; margin:.15rem 0 .7rem; }
+        .module-image { border-radius:18px; border:1px solid #ead8d1; }
         .feedback-good { border-left:5px solid #18794e;background:#edf8f2;padding:1rem;border-radius:10px;color:#111; }
         .feedback-bad { border-left:5px solid #c9362b;background:#fff1ef;padding:1rem;border-radius:10px;color:#111; }
         .timeline-row { border-left:3px solid #e4574f; padding:.25rem 0 .8rem 1rem; color:#111; }
@@ -312,9 +330,21 @@ def metrics():
     cols[3].metric("Governance readiness", f"{st.session_state.readiness}/100")
 
 
+def choose_page(page, key, all_pages):
+    if st.session_state.get(key):
+        st.session_state.current_page = page
+        for other in all_pages:
+            other_key = f"nav_{other}"
+            if other_key != key:
+                st.session_state[other_key] = False
+    elif st.session_state.current_page == page:
+        st.session_state.current_page = "Home"
+        st.session_state["nav_Home"] = True
+
+
 def sidebar():
     with st.sidebar:
-        st.markdown("## 🧭 AI Certificate")
+        st.markdown("## 🧭 AI Policy & Governance Certification")
         st.session_state.student_name = st.text_input(
             "Enter name for your certificate",
             value=st.session_state.student_name,
@@ -323,14 +353,21 @@ def sidebar():
         st.caption(f"{count} of {len(MODULES)} modules completed")
         st.progress(count / len(MODULES))
         pages = ["Home"] + list(MODULES) + ["Final Audit", "Certificate & Results"]
-        page = st.radio("Course navigation", pages, label_visibility="collapsed")
+        for page in pages:
+            key = f"nav_{page}"
+            if key not in st.session_state:
+                st.session_state[key] = page == st.session_state.current_page
+            label = page
+            if page in st.session_state.completed:
+                label = f"✅ {page}"
+            st.checkbox(label, key=key, on_change=choose_page, args=(page, key, pages))
         st.divider()
         st.caption("You may stop after any module. Download your report before closing the page.")
         if st.button("Reset activity", use_container_width=True):
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.rerun()
-    return page
+    return st.session_state.current_page
 
 
 def home():
@@ -392,6 +429,9 @@ def module_page(name):
     module = MODULES[name]
     st.caption(f"MODULE {list(MODULES).index(name) + 1} OF {len(MODULES)}")
     st.markdown(f"<h1 class='topic-title'>{name}</h1>", unsafe_allow_html=True)
+    header_path = HEADER_IMAGES[name]
+    if header_path.exists():
+        st.image(str(header_path), use_container_width=True)
     lesson_content(module)
     if name == "7. Hallucinated Claims" and RISKY_AD_PATH.exists():
         st.image(str(RISKY_AD_PATH), caption="Fictional AI-generated NovaGlow advertisement", width=520)
