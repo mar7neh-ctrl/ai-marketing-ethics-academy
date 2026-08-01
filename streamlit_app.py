@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 
-import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -361,9 +360,15 @@ def render_module_visual(module_name: str) -> None:
             </div></div>
             """, unsafe_allow_html=True)
     elif module_name.startswith("6."):
-        chart_data = pd.DataFrame({"Metric": ["Conversion", "False-claim flags", "Demographic complaints"], "Before update": [100, 100, 100], "After update": [118, 310, 295]}).melt("Metric", var_name="Period", value_name="Index")
-        chart = alt.Chart(chart_data).mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4).encode(x=alt.X("Metric:N", sort=None), xOffset="Period:N", y=alt.Y("Index:Q", title="Index (before = 100)"), color=alt.Color("Period:N", scale=alt.Scale(range=["#98a2b3", "#ff7566"]))).properties(height=300)
-        st.altair_chart(chart, use_container_width=True)
+        chart_data = pd.DataFrame(
+            {
+                "Before update": [100, 100, 100],
+                "After update": [118, 310, 295],
+            },
+            index=["Conversion", "False-claim flags", "Demographic complaints"],
+        )
+        st.bar_chart(chart_data, height=300, color=["#98a2b3", "#ff7566"])
+        st.caption("Index: performance before the model update = 100")
     else:
         st.markdown(
             """
