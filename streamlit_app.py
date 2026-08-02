@@ -958,15 +958,6 @@ def final_audit():
         decision = "READY FOR GOVERNED LAUNCH" if audit["score"] == 100 else "PAUSE AND REVISE"
         st.success(f"Final audit: {audit['score']}% • {decision}")
         st.markdown("**Key lesson:** A checklist makes governance controls visible and auditable, but people remain responsible for interpreting risks and outcomes.")
-        st.write("")
-        if st.button(
-            "Go to Certificate & Results →",
-            type="primary",
-            use_container_width=True,
-            key="go_to_certificate_results",
-        ):
-            st.session_state.current_page = "Certificate & Results"
-            st.rerun()
 
 
 def report_text():
