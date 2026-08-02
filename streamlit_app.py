@@ -31,6 +31,16 @@ HEADER_IMAGES = {
 }
 
 
+def find_image(expected_path: Path) -> Path | None:
+    """Find a module image in assets or the repository root, as PNG or JPEG."""
+    for folder in (BASE_DIR / "assets", BASE_DIR):
+        for extension in (".png", ".jpg", ".jpeg", ".webp"):
+            candidate = folder / f"{expected_path.stem}{extension}"
+            if candidate.exists():
+                return candidate
+    return None
+
+
 def option(correct, revenue, trust, risk, readiness, feedback):
     return {
         "correct": correct,
@@ -282,6 +292,11 @@ def inject_css():
         [data-testid="stSidebar"] { background:#172033; }
         [data-testid="stSidebar"] * { color:#ffffff; }
         [data-testid="stSidebar"] .stProgress > div > div { background:#ff7566; }
+        [data-testid="stSidebar"] [data-testid="stCheckbox"] label:has(input:checked)
+        span[data-baseweb="checkbox"] {
+          background:#16a34a !important;
+          border-color:#16a34a !important;
+        }
         /* Keep ordinary main-page copy readable on the cream background. */
         [data-testid="stMain"],
         [data-testid="stMain"] p,
@@ -376,12 +391,20 @@ def metrics():
     cols[3].metric("Governance readiness", f"{st.session_state.readiness}/100")
 
 
+def page_is_complete(page):
+    return page in st.session_state.completed or (
+        page == "Final Audit" and st.session_state.final_audit is not None
+    )
+
+
 def choose_page(page, key, all_pages):
-    if st.session_state.get(key):
+    # Completed items stay checked; selecting any item also opens that page.
+    if st.session_state.get(key) or page_is_complete(page):
+        st.session_state[key] = True
         st.session_state.current_page = page
         for other in all_pages:
             other_key = f"nav_{other}"
-            if other_key != key:
+            if other_key != key and not page_is_complete(other):
                 st.session_state[other_key] = False
     elif st.session_state.current_page == page:
         st.session_state.current_page = "Home"
@@ -402,11 +425,10 @@ def sidebar():
         for page in pages:
             key = f"nav_{page}"
             if key not in st.session_state:
-                st.session_state[key] = page == st.session_state.current_page
-            label = page
-            if page in st.session_state.completed:
-                label = f"✅ {page}"
-            st.checkbox(label, key=key, on_change=choose_page, args=(page, key, pages))
+                st.session_state[key] = page == st.session_state.current_page or page_is_complete(page)
+            elif page_is_complete(page):
+                st.session_state[key] = True
+            st.checkbox(page, key=key, on_change=choose_page, args=(page, key, pages))
         st.divider()
         st.caption("You may stop after any module. Download your report before closing the page.")
         if st.button("Reset activity", use_container_width=True):
@@ -475,8 +497,8 @@ def module_page(name):
     module = MODULES[name]
     st.caption(f"MODULE {list(MODULES).index(name) + 1} OF {len(MODULES)}")
     st.markdown(f"<h1 class='topic-title'>{name}</h1>", unsafe_allow_html=True)
-    header_path = HEADER_IMAGES[name]
-    if header_path.exists():
+    header_path = find_image(HEADER_IMAGES[name])
+    if header_path:
         st.image(str(header_path), use_container_width=True)
     lesson_content(module)
     if name == "7. Hallucinated Claims" and RISKY_AD_PATH.exists():
@@ -530,6 +552,7 @@ def final_audit():
             "selected": selected,
             "reflection": reflection.strip(),
         }
+        st.session_state["nav_Final Audit"] = True
         st.rerun()
     if st.session_state.final_audit:
         audit = st.session_state.final_audit
