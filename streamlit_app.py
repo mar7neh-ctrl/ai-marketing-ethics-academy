@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime
+import json
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 
 st.set_page_config(
@@ -263,15 +265,21 @@ MODULES = {
     },
 }
 
-BASELINE = {"revenue": 50_000, "trust": 70, "risk": 25, "readiness": 55}
+BASELINE = {"reviewed": 0, "responsible": 0, "risk": 0.0, "readiness": 0.0}
 
 
 def init_state():
+    if st.session_state.get("scoring_version") != 2:
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.session_state.scoring_version = 2
     defaults = {
         "answers": {},
         "completed": [],
-        "revenue": BASELINE["revenue"],
-        "trust": BASELINE["trust"],
+        "celebrated": [],
+        "completion_celebration": False,
+        "reviewed": BASELINE["reviewed"],
+        "responsible": BASELINE["responsible"],
         "risk": BASELINE["risk"],
         "readiness": BASELINE["readiness"],
         "final_audit": None,
@@ -364,6 +372,14 @@ def inject_css():
           background:linear-gradient(135deg,#fff0e9,#ffe0d6 58%,#fff6f2);
           border:2px solid #e4574f;
           box-shadow:0 16px 38px rgba(90,20,20,.18); }
+        .welcome-title {
+          color:#a62220 !important;
+          text-align:center;
+          font-size:2.7rem;
+          font-weight:900;
+          letter-spacing:.08em;
+          margin:.15rem 0 1rem;
+        }
         .hero h1 { color:#a62220 !important; font-size:2.35rem; line-height:1.12; margin:.4rem 0 .7rem; }
         .hero p { color:#111111 !important; font-size:1.03rem; max-width:900px; }
         .eyebrow { color:#b52a28; letter-spacing:.12em; font-size:.78rem; font-weight:800; }
@@ -408,6 +424,104 @@ def inject_css():
           color:#111111 !important;
           background:#ffffff !important;
         }
+        .money-rain {
+          position:fixed;
+          inset:0;
+          z-index:999999;
+          overflow:hidden;
+          pointer-events:none;
+        }
+        .money-rain span {
+          position:absolute;
+          top:-12vh;
+          left:var(--x);
+          font-size:var(--size);
+          opacity:0;
+          animation:money-fall 2.8s ease-in var(--delay) forwards;
+          filter:drop-shadow(0 3px 3px rgba(0,0,0,.2));
+        }
+        @keyframes money-fall {
+          0% { transform:translate3d(0,-8vh,0) rotate(0deg); opacity:0; }
+          12% { opacity:1; }
+          100% { transform:translate3d(var(--drift),112vh,0) rotate(540deg); opacity:0; }
+        }
+        @media (prefers-reduced-motion:reduce) {
+          .money-rain span { animation-duration:.01ms; }
+        }
+        .mascot-stage {
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          gap:.4rem;
+          margin:.25rem auto .55rem;
+        }
+        .mascot-robot {
+          display:inline-block;
+          font-size:4.5rem;
+          line-height:1;
+          filter:drop-shadow(0 6px 5px rgba(23,32,51,.2));
+          animation:mascot-bob 2.2s ease-in-out infinite;
+        }
+        .mascot-hand {
+          display:inline-block;
+          font-size:2.4rem;
+          transform-origin:20% 85%;
+          animation:mascot-wave .8s ease-in-out infinite alternate;
+        }
+        .mascot-message {
+          max-width:340px;
+          margin:0 auto 1rem;
+          padding:.55rem 1rem;
+          border-radius:999px;
+          background:#fff1eb;
+          border:2px solid #e4574f;
+          color:#172033 !important;
+          text-align:center;
+          font-weight:800;
+        }
+        .celebration-layer {
+          position:fixed;
+          inset:0;
+          z-index:1000000;
+          overflow:hidden;
+          pointer-events:none;
+        }
+        .celebration-mascot {
+          position:absolute;
+          left:50%;
+          bottom:6vh;
+          font-size:6rem;
+          filter:drop-shadow(0 8px 6px rgba(0,0,0,.25));
+          animation:mascot-jump 2.8s ease-out forwards;
+        }
+        .confetti-piece {
+          position:absolute;
+          top:-12vh;
+          left:var(--x);
+          font-size:var(--size);
+          opacity:0;
+          animation:confetti-fall 3.1s ease-in var(--delay) forwards;
+        }
+        @keyframes mascot-bob {
+          0%,100% { transform:translateY(0); }
+          50% { transform:translateY(-8px); }
+        }
+        @keyframes mascot-wave {
+          from { transform:rotate(-16deg); }
+          to { transform:rotate(24deg); }
+        }
+        @keyframes mascot-jump {
+          0% { transform:translate(-50%,40vh) scale(.7) rotate(-8deg); opacity:0; }
+          20% { opacity:1; }
+          48% { transform:translate(-50%,-45vh) scale(1.2) rotate(8deg); }
+          72% { transform:translate(-50%,-8vh) scale(1) rotate(-5deg); }
+          100% { transform:translate(-50%,0) scale(1) rotate(0); opacity:0; }
+        }
+        @keyframes confetti-fall {
+          0% { transform:translateY(-10vh) rotate(0); opacity:0; }
+          10% { opacity:1; }
+          100% { transform:translateY(115vh) rotate(720deg); opacity:0; }
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -415,16 +529,108 @@ def inject_css():
 
 
 def clamp_metrics():
-    for key in ("trust", "risk", "readiness"):
+    for key in ("risk", "readiness"):
         st.session_state[key] = max(0, min(100, st.session_state[key]))
 
 
 def metrics():
     cols = st.columns(4)
-    cols[0].metric("Campaign value", f"${st.session_state.revenue:,.0f}")
-    cols[1].metric("Brand trust", f"{st.session_state.trust}/100")
-    cols[2].metric("Legal & ethical risk", f"{st.session_state.risk}/100", delta_color="inverse")
-    cols[3].metric("Governance readiness", f"{st.session_state.readiness}/100")
+    cols[0].metric("Modules reviewed", f"{st.session_state.reviewed}/12")
+    cols[1].metric("Responsible decisions", f"{st.session_state.responsible}/12")
+    cols[2].metric("Risk exposure", f"{st.session_state.risk:.1f}/100")
+    cols[3].metric("Governance readiness", f"{st.session_state.readiness:.1f}/100")
+
+
+def emoji_burst(emojis, include_mascot=False):
+    """Attach a temporary animation to the parent Streamlit page."""
+    script = f"""
+    <script>
+    (() => {{
+      try {{
+        const doc = window.parent.document;
+        const old = doc.getElementById('academy-emoji-celebration');
+        if (old) old.remove();
+        if (!doc.getElementById('academy-emoji-style')) {{
+          const style = doc.createElement('style');
+          style.id = 'academy-emoji-style';
+          style.textContent = `
+            @keyframes academyFall {{
+              0% {{ transform:translateY(-12vh) rotate(0deg); opacity:0; }}
+              10% {{ opacity:1; }}
+              100% {{ transform:translateY(115vh) rotate(720deg); opacity:0; }}
+            }}
+            @keyframes academyJump {{
+              0% {{ transform:translate(-50%,45vh) scale(.65); opacity:0; }}
+              18% {{ opacity:1; }}
+              48% {{ transform:translate(-50%,-45vh) scale(1.25) rotate(8deg); }}
+              76% {{ transform:translate(-50%,-5vh) scale(1); }}
+              100% {{ transform:translate(-50%,10vh) scale(.9); opacity:0; }}
+            }}`;
+          doc.head.appendChild(style);
+        }}
+        const layer = doc.createElement('div');
+        layer.id = 'academy-emoji-celebration';
+        Object.assign(layer.style, {{position:'fixed', inset:'0', zIndex:'2147483647',
+          overflow:'hidden', pointerEvents:'none'}});
+        const emojis = {json.dumps(emojis)};
+        for (let i = 0; i < 42; i++) {{
+          const piece = doc.createElement('span');
+          piece.textContent = emojis[i % emojis.length];
+          Object.assign(piece.style, {{position:'absolute', left:((i*43)%98)+'%', top:'-12vh',
+            fontSize:(1.5+(i%6)*.22)+'rem', opacity:'0',
+            animation:`academyFall 3.2s ease-in ${{(i%10)*.08}}s forwards`}});
+          layer.appendChild(piece);
+        }}
+        if ({str(include_mascot).lower()}) {{
+          const mascot = doc.createElement('div');
+          mascot.textContent = '🤖🏆';
+          Object.assign(mascot.style, {{position:'absolute', left:'50%', bottom:'5vh',
+            fontSize:'6rem', filter:'drop-shadow(0 8px 6px rgba(0,0,0,.25))',
+            animation:'academyJump 3.2s ease-out forwards'}});
+          layer.appendChild(mascot);
+        }}
+        doc.body.appendChild(layer);
+        setTimeout(() => layer.remove(), 4300);
+      }} catch (error) {{ console.log(error); }}
+    }})();
+    </script>
+    """
+    components.html(script, height=0, width=0)
+
+
+def money_celebration():
+    emoji_burst(["💵", "💰", "🤑", "💸"])
+    st.toast("Correct decision! Money and trust protected. 💰", icon="✅")
+
+
+def mascot_welcome(message="Hi! I’ll be your AI governance guide."):
+    components.html(
+        f"""
+        <style>
+          body {{ margin:0; font-family:Arial,sans-serif; overflow:hidden; }}
+          .stage {{ display:flex; justify-content:center; align-items:center; gap:8px; }}
+          .robot {{ font-size:68px; animation:bob 2s ease-in-out infinite; }}
+          .hand {{ font-size:38px; transform-origin:20% 85%; animation:wave .7s ease-in-out infinite alternate; }}
+          .message {{ margin:5px auto 0; width:max-content; max-width:90%; padding:8px 18px;
+            border-radius:999px; background:#fff1eb; border:2px solid #e4574f;
+            color:#172033; text-align:center; font-weight:800; }}
+          @keyframes bob {{ 0%,100%{{transform:translateY(0)}} 50%{{transform:translateY(-7px)}} }}
+          @keyframes wave {{ from{{transform:rotate(-18deg)}} to{{transform:rotate(25deg)}} }}
+        </style>
+        <div class="stage"><span class="robot">🤖</span><span class="hand">👋</span></div>
+        <div class="message">{message}</div>
+        """,
+        height=135,
+    )
+
+
+def trigger_completion_celebration():
+    st.session_state.completion_celebration = True
+
+
+def completion_celebration():
+    emoji_burst(["🎉", "🎊", "✨", "⭐", "🏆", "💰"], include_mascot=True)
+    st.balloons()
 
 
 def page_is_complete(page):
@@ -476,6 +682,8 @@ def sidebar():
 
 
 def home():
+    mascot_welcome()
+    st.markdown("<div class='welcome-title'>WELCOME!</div>", unsafe_allow_html=True)
     st.markdown(
         f"""
         <div class="hero">
@@ -525,11 +733,13 @@ def submit_answer(name, choice):
     if name in st.session_state.answers:
         return
     result = MODULES[name]["options"][choice]
-    revenue, trust, risk, readiness = result["delta"]
-    st.session_state.revenue += revenue
-    st.session_state.trust += trust
-    st.session_state.risk += risk
-    st.session_state.readiness += readiness
+    st.session_state.reviewed += 1
+    if result["correct"]:
+        st.session_state.responsible += 1
+        st.session_state.readiness += 100 / len(MODULES)
+    else:
+        original_risk = result["delta"][2]
+        st.session_state.risk += 10 if original_risk >= 30 else 5
     clamp_metrics()
     st.session_state.answers[name] = choice
     st.session_state.completed.append(name)
@@ -568,6 +778,9 @@ def module_page(name):
             st.rerun()
     if saved:
         result = module["options"][saved]
+        if result["correct"] and name not in st.session_state.celebrated:
+            money_celebration()
+            st.session_state.celebrated.append(name)
         style = "feedback-good" if result["correct"] else "feedback-bad"
         heading = "Strong governance decision" if result["correct"] else "Risky governance decision"
         st.markdown(f"<div class='{style}'><b>{heading}</b><br>{result['feedback']}</div>", unsafe_allow_html=True)
@@ -618,11 +831,10 @@ def report_text():
         f"Student: {name}",
         f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
         "",
-        f"Modules completed: {len(st.session_state.completed)} of {len(MODULES)}",
-        f"Campaign value: ${st.session_state.revenue:,.0f}",
-        f"Brand trust: {st.session_state.trust}/100",
-        f"Legal and ethical risk: {st.session_state.risk}/100",
-        f"Governance readiness: {st.session_state.readiness}/100",
+        f"Modules reviewed: {st.session_state.reviewed} of {len(MODULES)}",
+        f"Responsible decisions: {st.session_state.responsible} of {len(MODULES)}",
+        f"Risk exposure: {st.session_state.risk:.1f}/100",
+        f"Governance readiness: {st.session_state.readiness:.1f}/100",
         "",
         "MODULE DECISIONS",
     ]
@@ -646,6 +858,7 @@ def results_page():
     metrics()
     complete = len(st.session_state.completed) == len(MODULES) and st.session_state.final_audit is not None
     if complete:
+        mascot_welcome("You did it! Download your report to celebrate.")
         name = st.session_state.student_name or "AI Marketing Risk Analyst"
         st.markdown(
             f"<div class='certificate'><div class='section-label'>CERTIFICATE OF COMPLETION</div><h2>{SITE_TITLE}</h2><p>This certifies that <b>{name}</b> completed all twelve learning modules and the Final AI Marketing Governance Audit.</p></div>",
@@ -653,6 +866,9 @@ def results_page():
         )
     else:
         st.info("Complete all twelve modules and the Final Audit to earn the certificate. You may download your current progress at any time.")
+    if st.session_state.completion_celebration:
+        completion_celebration()
+        st.session_state.completion_celebration = False
     st.download_button(
         "Download completion report",
         data=report_text(),
@@ -660,6 +876,7 @@ def results_page():
         mime="text/plain",
         type="primary",
         use_container_width=True,
+        on_click=trigger_completion_celebration,
     )
 
 
