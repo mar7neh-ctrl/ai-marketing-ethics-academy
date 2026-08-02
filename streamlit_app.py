@@ -301,27 +301,37 @@ def inject_css():
         }
         [data-testid="stSidebar"] div.stButton > button {
           width:100%;
-          justify-content:flex-start;
-          text-align:left;
-          border-radius:10px;
-          padding:.48rem .65rem;
-          min-height:2.5rem;
+          justify-content:center;
+          text-align:center;
+          border-radius:999px;
+          padding:.65rem 1rem;
+          min-height:3.15rem;
+          margin:.18rem 0;
+          box-shadow:0 3px 8px rgba(0,0,0,.18);
         }
         [data-testid="stSidebar"] div.stButton > button[kind="secondary"] {
-          background:transparent;
-          border:1px solid transparent;
+          background:#253149;
+          border:1px solid #46536d;
           color:#ffffff !important;
         }
         [data-testid="stSidebar"] div.stButton > button[kind="secondary"]:hover {
-          background:#253149;
-          border-color:#3a4761;
+          background:#313f5b;
+          border-color:#64718b;
+          transform:translateY(-1px);
         }
         [data-testid="stSidebar"] div.stButton > button[kind="primary"] {
-          background:#e4574f;
-          border-color:#e4574f;
-          color:#ffffff !important;
+          background:linear-gradient(180deg,#ffd34e 0%,#ffae18 42%,#ff7500 100%);
+          border:2px solid #fff1c4;
+          color:#341b00 !important;
+          box-shadow:inset 0 4px 7px rgba(255,255,255,.55),0 4px 10px rgba(0,0,0,.28);
         }
-        [data-testid="stSidebar"] div.stButton > button p { color:#ffffff !important; }
+        [data-testid="stSidebar"] div.stButton > button[kind="secondary"] p { color:#ffffff !important; }
+        [data-testid="stSidebar"] div.stButton > button[kind="primary"] p { color:#341b00 !important; }
+        [data-testid="stSidebar"] div.stButton > button p {
+          width:100%;
+          text-align:center !important;
+          line-height:1.25;
+        }
         /* Keep ordinary main-page copy readable on the cream background. */
         [data-testid="stMain"],
         [data-testid="stMain"] p,
@@ -449,7 +459,8 @@ def sidebar():
         st.markdown("<div class='nav-heading'>MODULES</div>", unsafe_allow_html=True)
         for page in MODULES:
             status = "✅" if page_is_complete(page) else "○"
-            nav_button(page, f"{status}  {page}")
+            display_name = page.split(". ", 1)[1]
+            nav_button(page, f"{status}  {display_name}")
         st.markdown("<div class='nav-heading'>CERTIFICATION</div>", unsafe_allow_html=True)
         audit_status = "✅" if page_is_complete("Final Audit") else "○"
         nav_button("Final Audit", f"{audit_status}  Final Audit")
