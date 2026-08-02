@@ -1,0 +1,14 @@
+Place the twelve 1600 x 600 PNG header images in this folder.
+Use the exact filenames listed in IMAGE_PROMPTS.md.
+module_01_header.png
+module_02_header.png
+module_03_header.png
+module_04_header.png
+module_05_header.png
+module_06_header.png
+module_07_header.png
+module_08_header.png
+module_09_header.png
+module_10_header.png
+module_11_header.png
+module_12_header.png
