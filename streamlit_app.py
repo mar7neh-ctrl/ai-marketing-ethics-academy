@@ -448,8 +448,12 @@ def inject_css():
           letter-spacing:.12em;
           margin-bottom:.45rem;
         }
-        [data-testid="stMain"] .story-card h3 {
-          color:#ffffff !important;
+        [data-testid="stMain"] .story-card h3,
+        [data-testid="stMain"] .story-card h3 *,
+        [data-testid="stMain"] .story-card h3 span,
+        [data-testid="stMain"] .story-card h3 a {
+          color:#ffd34e !important;
+          -webkit-text-fill-color:#ffd34e !important;
           margin:.1rem 0 .5rem;
           text-shadow:0 1px 2px rgba(0,0,0,.25);
         }
@@ -958,6 +962,15 @@ def final_audit():
         decision = "READY FOR GOVERNED LAUNCH" if audit["score"] == 100 else "PAUSE AND REVISE"
         st.success(f"Final audit: {audit['score']}% • {decision}")
         st.markdown("**Key lesson:** A checklist makes governance controls visible and auditable, but people remain responsible for interpreting risks and outcomes.")
+        st.write("")
+        if st.button(
+            "Go to Certificate & Results →",
+            type="primary",
+            use_container_width=True,
+            key="go_to_certificate_results",
+        ):
+            st.session_state.current_page = "Certificate & Results"
+            st.rerun()
 
 
 def report_text():
