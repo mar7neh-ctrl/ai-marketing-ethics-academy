@@ -292,11 +292,36 @@ def inject_css():
         [data-testid="stSidebar"] { background:#172033; }
         [data-testid="stSidebar"] * { color:#ffffff; }
         [data-testid="stSidebar"] .stProgress > div > div { background:#ff7566; }
-        [data-testid="stSidebar"] [data-testid="stCheckbox"] label:has(input:checked)
-        span[data-baseweb="checkbox"] {
-          background:#16a34a !important;
-          border-color:#16a34a !important;
+        [data-testid="stSidebar"] .nav-heading {
+          color:#9fa9bc !important;
+          font-size:.72rem;
+          font-weight:800;
+          letter-spacing:.12em;
+          margin:1rem 0 .25rem;
         }
+        [data-testid="stSidebar"] div.stButton > button {
+          width:100%;
+          justify-content:flex-start;
+          text-align:left;
+          border-radius:10px;
+          padding:.48rem .65rem;
+          min-height:2.5rem;
+        }
+        [data-testid="stSidebar"] div.stButton > button[kind="secondary"] {
+          background:transparent;
+          border:1px solid transparent;
+          color:#ffffff !important;
+        }
+        [data-testid="stSidebar"] div.stButton > button[kind="secondary"]:hover {
+          background:#253149;
+          border-color:#3a4761;
+        }
+        [data-testid="stSidebar"] div.stButton > button[kind="primary"] {
+          background:#e4574f;
+          border-color:#e4574f;
+          color:#ffffff !important;
+        }
+        [data-testid="stSidebar"] div.stButton > button p { color:#ffffff !important; }
         /* Keep ordinary main-page copy readable on the cream background. */
         [data-testid="stMain"],
         [data-testid="stMain"] p,
@@ -397,18 +422,16 @@ def page_is_complete(page):
     )
 
 
-def choose_page(page, key, all_pages):
-    # Completed items stay checked; selecting any item also opens that page.
-    if st.session_state.get(key) or page_is_complete(page):
-        st.session_state[key] = True
+def nav_button(page, label):
+    active = st.session_state.current_page == page
+    if st.button(
+        label,
+        key=f"menu_{page}",
+        type="primary" if active else "secondary",
+        use_container_width=True,
+    ):
         st.session_state.current_page = page
-        for other in all_pages:
-            other_key = f"nav_{other}"
-            if other_key != key and not page_is_complete(other):
-                st.session_state[other_key] = False
-    elif st.session_state.current_page == page:
-        st.session_state.current_page = "Home"
-        st.session_state["nav_Home"] = True
+        st.rerun()
 
 
 def sidebar():
@@ -421,14 +444,16 @@ def sidebar():
         count = len(st.session_state.completed)
         st.caption(f"{count} of {len(MODULES)} modules completed")
         st.progress(count / len(MODULES))
-        pages = ["Home"] + list(MODULES) + ["Final Audit", "Certificate & Results"]
-        for page in pages:
-            key = f"nav_{page}"
-            if key not in st.session_state:
-                st.session_state[key] = page == st.session_state.current_page or page_is_complete(page)
-            elif page_is_complete(page):
-                st.session_state[key] = True
-            st.checkbox(page, key=key, on_change=choose_page, args=(page, key, pages))
+        st.markdown("<div class='nav-heading'>COURSE</div>", unsafe_allow_html=True)
+        nav_button("Home", "🏠  Home")
+        st.markdown("<div class='nav-heading'>MODULES</div>", unsafe_allow_html=True)
+        for page in MODULES:
+            status = "✅" if page_is_complete(page) else "○"
+            nav_button(page, f"{status}  {page}")
+        st.markdown("<div class='nav-heading'>CERTIFICATION</div>", unsafe_allow_html=True)
+        audit_status = "✅" if page_is_complete("Final Audit") else "○"
+        nav_button("Final Audit", f"{audit_status}  Final Audit")
+        nav_button("Certificate & Results", "🏆  Certificate & Results")
         st.divider()
         st.caption("You may stop after any module. Download your report before closing the page.")
         if st.button("Reset activity", use_container_width=True):
@@ -552,7 +577,6 @@ def final_audit():
             "selected": selected,
             "reflection": reflection.strip(),
         }
-        st.session_state["nav_Final Audit"] = True
         st.rerun()
     if st.session_state.final_audit:
         audit = st.session_state.final_audit
