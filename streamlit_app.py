@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from html import escape
 import json
 from pathlib import Path
 import random
@@ -66,7 +67,7 @@ MODULES = {
             "Compliance & Regulation",
         ],
         "activity_title": "Build the governance foundation",
-        "prompt": "A company wants AI to write ads, choose customers, and publish posts. What should the company do first?",
+        "prompt": "Your boss wants the company to use AI to write ads, choose customers, and publish posts. Before the team begins, what should you recommend?",
         "options": {
             "Let each employee make their own rules": option(False, 15000, -12, 24, -18, "Individual judgment alone does not create consistent policies, controls, documentation, or accountability."),
             "Create clear rules, reviews, records, and human approval": option(True, 6000, 16, -16, 22, "Correct. This connects the frameworks, policies, controls, and human oversight described in AI governance."),
@@ -79,7 +80,7 @@ MODULES = {
         "slide_text": "An AI advertising system learns from past campaigns and primarily shows high-paying job ads to men because historical data reflects more male applicants.",
         "slide_items": ["Use diverse datasets, regularly audit models for bias, and include human oversight to reduce bias & discrimination."],
         "activity_title": "Audit the targeting model",
-        "prompt": "The AI mostly shows high-paying job ads to men. What should the company do?",
+        "prompt": "Your first AI campaign mostly shows high-paying job ads to men. What should you tell your boss the company must do?",
         "options": {
             "Keep it because men click more": option(False, 19000, -20, 32, -22, "Historical performance can reproduce discrimination. Higher clicks do not make unequal access fair."),
             "Show the ads more widely and test whether the results are fair": option(True, 8000, 16, -15, 21, "Correct. Diverse data, bias auditing, and human oversight reduce the chance of unfair marketing outcomes."),
@@ -91,7 +92,7 @@ MODULES = {
         "slide_title": "Key Ideas",
         "slide_text": "Note all the callouts, extreme ‘deals’, urgency indicators that could influence someone to make a purchase they might not otherwise using misleading/false data.",
         "activity_title": "Redesign the checkout trap",
-        "prompt": "A checkout page uses a fake countdown and hides the No button. What should the company do?",
+        "prompt": "The AI creates a checkout page with a fake countdown and a hidden No button. What should you do before the campaign launches?",
         "options": {
             "Keep the screen because urgency increases conversions": option(False, 18000, -18, 28, -20, "Conversion does not justify misleading urgency or interface choices designed to steer users."),
             "Show honest information and make Yes and No equally easy": option(True, 5000, 18, -16, 20, "Correct. The redesign allows a voluntary choice without false urgency or visual manipulation."),
@@ -108,7 +109,7 @@ MODULES = {
             "Strong AI governance balances personalization with privacy!",
         ],
         "activity_title": "Choose a responsible personalization plan",
-        "prompt": "The AI wants to use browsing, purchases, location, and health information for ads. What should the company do?",
+        "prompt": "Your boss wants highly personalized ads, and the AI asks for browsing, purchase, location, and health information. What plan should you approve?",
         "options": {
             "Use all the data because the ads will be more personal": option(False, 21000, -21, 35, -23, "Personalization does not remove the need for purpose limits, data minimization, and clear informed consent."),
             "Ask permission and use only the data the campaign truly needs": option(True, 7000, 19, -18, 22, "Correct. The approach balances useful personalization with privacy, consent, and customer trust."),
@@ -126,7 +127,7 @@ MODULES = {
             "Legal & brand protection",
         ],
         "activity_title": "Clear the campaign assets",
-        "prompt": "An ad uses copied writing, a famous character, and a customer quote without permission. What should the team do?",
+        "prompt": "The AI gives you an ad containing copied writing, a famous character, and a customer quote used without permission. What should you do?",
         "options": {
             "Publish everything because AI transformed the material": option(False, 17000, -13, 32, -20, "AI transformation does not automatically create permission or ownership."),
             "Use only approved material and save proof of permission": option(True, 5000, 14, -17, 23, "Correct. Rights clearance and human creative oversight protect the company legally and support an auditable record."),
@@ -145,7 +146,7 @@ MODULES = {
             "Policy compliance",
         ],
         "activity_title": "Make the AI disclosure clear",
-        "prompt": "An ad uses a fake AI influencer and an AI recommendation. What should customers be told?",
+        "prompt": "The AI creates a campaign using a fake influencer and an AI-generated recommendation. What should you require the company to tell customers?",
         "options": {
             "Put ‘AI may be used’ at the bottom of a 20-page privacy policy": option(False, 14000, -13, 23, -16, "A buried and vague statement is not clear and conspicuous."),
             "Put a clear label beside the ad explaining exactly what AI did": option(True, 5000, 17, -14, 20, "Correct. This tells people AI is being used and explains how it influenced the marketing content."),
@@ -164,7 +165,7 @@ MODULES = {
             "Continuous model monitoring",
         ],
         "activity_title": "Verify the suspicious skincare ad",
-        "prompt": "The AI says a skincare product works in 48 hours, but nobody checked the claim. What should happen?",
+        "prompt": "The AI writes that your company’s skincare product works in 48 hours, but nobody has checked the claim. What should you do before publishing it?",
         "options": {
             "Publish immediately because the wording sounds confident": option(False, 20000, -20, 34, -23, "Confidence is not evidence. The claims may be fabricated and could mislead customers and decision-makers."),
             "Stop and check every claim before a person approves the ad": option(True, 5000, 16, -17, 22, "Correct. Human review and continuous monitoring are needed because AI can present false information as fact."),
@@ -186,7 +187,7 @@ MODULES = {
             "PEOPLE REMAIN RESPONSIBLE — Marketing, legal, data, and security teams must share clear roles.",
         ],
         "activity_title": "Set the frontier-model controls",
-        "prompt": "A powerful AI can perform dangerous cyber tasks. Who should be allowed to use it?",
+        "prompt": "Your company is considering a powerful AI that can perform dangerous cyber tasks. What access rules should you recommend to your boss?",
         "options": {
             "Release the unrestricted model publicly and respond if misuse occurs": option(False, 28000, -22, 42, -27, "Reactive governance is weak when capability is high and safeguards may be bypassed."),
             "Only approved users, with identity checks, safety rules, monitoring, and a stop process": option(True, 4000, 19, -20, 25, "Correct. This governs capability, access, safeguards, monitoring, and accountability together."),
@@ -203,7 +204,7 @@ MODULES = {
             "Failing to properly use AI could result in negatively impact their reputation",
         ],
         "activity_title": "Protect the customer experience",
-        "prompt": "A customer is upset, but the AI bot gives a rude answer and will not connect them to a person. What should happen?",
+        "prompt": "A customer contacts your company, but the AI bot gives a rude answer and refuses to connect them to a person. What should you do?",
         "options": {
             "Keep the bot active because it reduces service costs": option(False, 16000, -25, 28, -20, "Cost savings do not offset inappropriate content, poor customer experience, and reputational harm."),
             "Connect the customer to a person, pause the bot, and fix the problem": option(True, 3000, 21, -18, 22, "Correct. Brand safety requires accurate and appropriate interactions plus a responsible balance of AI and human support."),
@@ -219,7 +220,7 @@ MODULES = {
             "Track performance",
         ],
         "activity_title": "Respond to the model shift",
-        "prompt": "After an AI update, sales rise, but false claims and customer complaints triple. What should the company do?",
+        "prompt": "After your company updates its AI model, sales rise, but false claims and customer complaints triple. What should you recommend?",
         "options": {
             "Keep running because the campaign is more profitable": option(False, 26000, -24, 39, -26, "Profit monitoring alone misses accuracy, fairness, customer-data, and brand risks."),
             "Pause the AI, save the records, find the problem, and undo the update if needed": option(True, -2000, 20, -21, 25, "Correct. Monitoring must connect performance, drift, anomalies, complaints, and accuracy to action."),
@@ -236,7 +237,7 @@ MODULES = {
             "Require new governance because they act independently.",
         ],
         "activity_title": "Decide who can press Publish",
-        "prompt": "An AI agent can write, choose customers, spend money, and publish by itself. What rules should it have?",
+        "prompt": "Your boss wants an AI agent that can write ads, choose customers, spend money, and publish without help. What limits should you require?",
         "options": {
             "Let the agent publish anything under $25,000": option(False, 21000, -18, 31, -22, "A spending threshold does not control claims, privacy, targeting, or brand risk."),
             "Set clear limits, require human approval, save its actions, and add an emergency stop": option(True, 6000, 18, -18, 24, "Correct. Agents that act independently require clear authority, oversight, auditability, monitoring, and shutdown controls."),
@@ -257,7 +258,7 @@ MODULES = {
             "Responsible AI will become a core business practice, not just a legal requirement.",
         ],
         "activity_title": "Approve the company AI policy",
-        "prompt": "Which company rule would best protect customers when employees use AI?",
+        "prompt": "Your boss asks you to create the company’s AI policy. Which rule would best protect customers and guide employees?",
         "options": {
             "Use one general rule: employees should use AI carefully": option(False, 12000, -10, 22, -17, "A vague statement does not assign responsibility, define risk levels, or create testing and monitoring requirements."),
             "Create stronger rules for riskier AI, test it, monitor it, and name the people responsible": option(True, 5000, 19, -19, 25, "Correct. This addresses the development, deployment, oversight, and changing risks of AI systems."),
@@ -345,6 +346,51 @@ def inject_css():
           text-align:center !important;
           line-height:1.25;
         }
+        [data-testid="stSidebar"] input {
+          background:#ffffff !important;
+          color:#111111 !important;
+          -webkit-text-fill-color:#111111 !important;
+          caret-color:#b52a28 !important;
+          color-scheme:light;
+        }
+        [data-testid="stSidebar"] input::placeholder {
+          color:#687080 !important;
+          -webkit-text-fill-color:#687080 !important;
+          opacity:1;
+        }
+        [data-testid="stSidebar"] input::selection {
+          background:#ffd1cc;
+          color:#111111;
+        }
+        [data-testid="stSidebar"] input:-webkit-autofill,
+        [data-testid="stSidebar"] input:-webkit-autofill:hover,
+        [data-testid="stSidebar"] input:-webkit-autofill:focus {
+          -webkit-text-fill-color:#111111 !important;
+          -webkit-box-shadow:0 0 0 1000px #ffffff inset !important;
+        }
+        @media (prefers-color-scheme:dark) {
+          [data-testid="stSidebar"] input {
+            background:#0d121c !important;
+            color:#ffffff !important;
+            -webkit-text-fill-color:#ffffff !important;
+            caret-color:#ffd34e !important;
+            color-scheme:dark;
+          }
+          [data-testid="stSidebar"] input::placeholder {
+            color:#aeb7c8 !important;
+            -webkit-text-fill-color:#aeb7c8 !important;
+          }
+          [data-testid="stSidebar"] input::selection {
+            background:#b52a28;
+            color:#ffffff;
+          }
+          [data-testid="stSidebar"] input:-webkit-autofill,
+          [data-testid="stSidebar"] input:-webkit-autofill:hover,
+          [data-testid="stSidebar"] input:-webkit-autofill:focus {
+            -webkit-text-fill-color:#ffffff !important;
+            -webkit-box-shadow:0 0 0 1000px #0d121c inset !important;
+          }
+        }
         /* Keep ordinary main-page copy readable on the cream background. */
         [data-testid="stMain"],
         [data-testid="stMain"] p,
@@ -387,6 +433,23 @@ def inject_css():
         .hero h1 { color:#a62220 !important; font-size:2.35rem; line-height:1.12; margin:.4rem 0 .7rem; }
         .hero p { color:#111111 !important; font-size:1.03rem; max-width:900px; }
         .eyebrow { color:#b52a28; letter-spacing:.12em; font-size:.78rem; font-weight:800; }
+        .story-card {
+          margin:1.25rem 0 1rem;
+          padding:1.25rem 1.5rem;
+          border-radius:18px;
+          background:#172033;
+          border:3px solid #ffae18;
+          box-shadow:0 10px 24px rgba(23,32,51,.16);
+        }
+        .story-card .story-label {
+          color:#ffd34e !important;
+          font-size:.78rem;
+          font-weight:900;
+          letter-spacing:.12em;
+          margin-bottom:.45rem;
+        }
+        .story-card h3 { color:#ffffff !important; margin:.1rem 0 .5rem; }
+        .story-card p { color:#ffffff !important; margin:0; line-height:1.65; }
         .lesson-card { background:white; border:1px solid #e7e2de; border-radius:18px;
           padding:1.25rem 1.4rem; box-shadow:0 7px 20px rgba(23,32,51,.05); margin-bottom:1rem; }
         .definition { background:#fff1eb; border-left:6px solid #e4574f; }
@@ -721,6 +784,19 @@ def home():
         """,
         unsafe_allow_html=True,
     )
+    learner_name = escape(
+        st.session_state.student_name if st.session_state.name_confirmed else "AI Marketing Manager"
+    )
+    st.markdown(
+        f"""
+        <div class="story-card">
+          <div class="story-label">YOUR ASSIGNMENT</div>
+          <h3>Welcome, {learner_name}!</h3>
+          <p>Your boss wants you to start using AI for your company’s marketing campaigns. As you begin integrating AI into your workflow, you encounter different situations where you must make an ethical decision based on the AI’s outputs. Each module will show you a different situation, and you must make the correct decision to show your boss that you’re able to successfully govern this AI system.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.write("")
     metrics()
     st.header("How the certification works")
@@ -916,8 +992,9 @@ def results_page():
     if complete:
         mascot_welcome("You did it! Download your report to celebrate.")
         name = st.session_state.student_name or "AI Marketing Risk Analyst"
+        certificate_name = escape(name)
         st.markdown(
-            f"<div class='certificate'><div class='section-label'>CERTIFICATE OF COMPLETION</div><h2>{SITE_TITLE}</h2><p>This certifies that <b>{name}</b> completed all twelve learning modules and the Final AI Marketing Governance Audit.</p></div>",
+            f"<div class='certificate'><div class='section-label'>CERTIFICATE OF COMPLETION</div><h2>{SITE_TITLE}</h2><p>This certifies that <b>{certificate_name}</b> completed all twelve learning modules and the Final AI Marketing Governance Audit.</p></div>",
             unsafe_allow_html=True,
         )
     else:
