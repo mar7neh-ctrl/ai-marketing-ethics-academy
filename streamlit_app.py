@@ -16,6 +16,7 @@ st.set_page_config(
 
 BASE_DIR = Path(__file__).resolve().parent
 RISKY_AD_PATH = BASE_DIR / "assets" / "risky_skincare_ad.png"
+CASE_LESSONS_PATH = BASE_DIR / "assets" / "case_study_lessons.png"
 SITE_TITLE = "AI POLICY, ETHICS, GOVERNANCE, AND RISK IN MARKETING ANALYTICS"
 
 HEADER_IMAGES = {
@@ -176,7 +177,7 @@ MODULES = {
             ("June 12", "ACCESS SUSPENDED — A government order followed reports that Fable’s safeguards could be bypassed."),
             ("July 1", "REDEPLOYED — Fable returned globally; Mythos remained limited to approved organizations."),
         ],
-        "slide_items": [
+        "lessons": [
             "ACCESS SHOULD MATCH RISK — Higher-risk AI capabilities require tiered access, identity controls, and approved-use restrictions.",
             "SAFETY CONTINUES AFTER LAUNCH — Companies must watch results, review problems, and pause systems when needed.",
             "PEOPLE REMAIN RESPONSIBLE — Marketing, legal, data, and security teams must share clear roles.",
@@ -458,12 +459,12 @@ def sidebar():
         nav_button("Home", "🏠  Home")
         st.markdown("<div class='nav-heading'>MODULES</div>", unsafe_allow_html=True)
         for page in MODULES:
-            status = "✅" if page_is_complete(page) else "○"
+            status = "✅  " if page_is_complete(page) else ""
             display_name = page.split(". ", 1)[1]
-            nav_button(page, f"{status}  {display_name}")
+            nav_button(page, f"{status}{display_name}")
         st.markdown("<div class='nav-heading'>CERTIFICATION</div>", unsafe_allow_html=True)
-        audit_status = "✅" if page_is_complete("Final Audit") else "○"
-        nav_button("Final Audit", f"{audit_status}  Final Audit")
+        audit_status = "✅  " if page_is_complete("Final Audit") else ""
+        nav_button("Final Audit", f"{audit_status}Final Audit")
         nav_button("Certificate & Results", "🏆  Certificate & Results")
         st.divider()
         st.caption("You may stop after any module. Download your report before closing the page.")
@@ -513,6 +514,11 @@ def lesson_content(module):
         body += "<ul>" + "".join(f"<li>{item}</li>" for item in module["slide_items"]) + "</ul>"
     body += "</div>"
     st.markdown(body, unsafe_allow_html=True)
+    if module.get("lessons"):
+        lessons = "<div class='lesson-card definition'><div class='section-label'>LESSONS LEARNED FROM ANTHROPIC</div><ol>"
+        lessons += "".join(f"<li>{item}</li>" for item in module["lessons"])
+        lessons += "</ol></div>"
+        st.markdown(lessons, unsafe_allow_html=True)
 
 
 def submit_answer(name, choice):
@@ -537,6 +543,14 @@ def module_page(name):
     if header_path:
         st.image(str(header_path), use_container_width=True)
     lesson_content(module)
+    if name == "8. Case Study: Anthropic Claude Mythos & Fable 5":
+        lessons_path = find_image(CASE_LESSONS_PATH)
+        if lessons_path:
+            st.image(
+                str(lessons_path),
+                caption="Lessons learned from Anthropic",
+                use_container_width=True,
+            )
     if name == "7. Hallucinated Claims" and RISKY_AD_PATH.exists():
         st.image(str(RISKY_AD_PATH), caption="Fictional AI-generated NovaGlow advertisement", width=520)
     st.markdown(
