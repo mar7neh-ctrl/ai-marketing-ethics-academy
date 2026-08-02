@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 import json
 from pathlib import Path
+import random
 
 import pandas as pd
 import streamlit as st
@@ -65,7 +66,7 @@ MODULES = {
             "Compliance & Regulation",
         ],
         "activity_title": "Build the governance foundation",
-        "prompt": "NovaGlow wants AI to write ads, choose customers, and publish posts. What should the company do first?",
+        "prompt": "A company wants AI to write ads, choose customers, and publish posts. What should the company do first?",
         "options": {
             "Let each employee make their own rules": option(False, 15000, -12, 24, -18, "Individual judgment alone does not create consistent policies, controls, documentation, or accountability."),
             "Create clear rules, reviews, records, and human approval": option(True, 6000, 16, -16, 22, "Correct. This connects the frameworks, policies, controls, and human oversight described in AI governance."),
@@ -269,10 +270,10 @@ BASELINE = {"reviewed": 0, "responsible": 0, "readiness": 0.0}
 
 
 def init_state():
-    if st.session_state.get("scoring_version") != 3:
+    if st.session_state.get("scoring_version") != 4:
         for key in list(st.session_state.keys()):
             del st.session_state[key]
-        st.session_state.scoring_version = 3
+        st.session_state.scoring_version = 4
     defaults = {
         "answers": {},
         "completed": [],
@@ -283,6 +284,10 @@ def init_state():
         "readiness": BASELINE["readiness"],
         "final_audit": None,
         "student_name": "",
+        "name_draft": "",
+        "name_confirmed": False,
+        "option_orders": {},
+        "shuffle_offset": random.randint(0, 2),
         "current_page": "Home",
     }
     for key, value in defaults.items():
@@ -417,6 +422,18 @@ def inject_css():
           background:#8f1f1d;
           border-color:#8f1f1d;
           color:#ffffff !important;
+        }
+        [data-testid="stMain"] div.stButton > button:disabled {
+          background:#d8dce5 !important;
+          border:2px solid #aeb5c2 !important;
+          color:#515968 !important;
+          opacity:1 !important;
+          cursor:not-allowed;
+          box-shadow:none;
+        }
+        [data-testid="stMain"] div.stButton > button:disabled p {
+          color:#515968 !important;
+          opacity:1 !important;
         }
         [data-testid="stMain"] input,
         [data-testid="stMain"] textarea {
@@ -651,10 +668,23 @@ def nav_button(page, label):
 def sidebar():
     with st.sidebar:
         st.markdown("## 🧭 AI Policy & Governance Certification")
-        st.session_state.student_name = st.text_input(
-            "Enter name for your certificate",
-            value=st.session_state.student_name,
-        ).strip()
+        with st.form("certificate_name_form"):
+            name_entry = st.text_input(
+                "Enter name for your certificate",
+                key="name_draft",
+                placeholder="Type your full name",
+            )
+            save_name = st.form_submit_button("Enter name", use_container_width=True)
+        if save_name:
+            cleaned_name = name_entry.strip()
+            if cleaned_name:
+                st.session_state.student_name = cleaned_name
+                st.session_state.name_confirmed = True
+            else:
+                st.session_state.name_confirmed = False
+                st.error("Please enter your name before continuing.")
+        if st.session_state.name_confirmed:
+            st.success(f"✓ Certificate name saved: {st.session_state.student_name}")
         count = len(st.session_state.completed)
         st.caption(f"{count} of {len(MODULES)} modules completed")
         st.progress(count / len(MODULES))
@@ -739,6 +769,23 @@ def submit_answer(name, choice):
     st.session_state.completed.append(name)
 
 
+def shuffled_choices(name):
+    if name not in st.session_state.option_orders:
+        choices = list(MODULES[name]["options"])
+        random.shuffle(choices)
+        correct_choice = next(
+            choice for choice in choices if MODULES[name]["options"][choice]["correct"]
+        )
+        module_index = list(MODULES).index(name)
+        target_position = (module_index + st.session_state.shuffle_offset) % len(choices)
+        current_position = choices.index(correct_choice)
+        choices[current_position], choices[target_position] = (
+            choices[target_position], choices[current_position]
+        )
+        st.session_state.option_orders[name] = choices
+    return st.session_state.option_orders[name]
+
+
 def module_page(name):
     module = MODULES[name]
     st.caption(f"MODULE {list(MODULES).index(name) + 1} OF {len(MODULES)}")
@@ -762,7 +809,7 @@ def module_page(name):
         unsafe_allow_html=True,
     )
     saved = st.session_state.answers.get(name)
-    choices = list(module["options"])
+    choices = shuffled_choices(name)
     if saved:
         st.radio("Choose the best response", choices, index=choices.index(saved), disabled=True, key=f"locked_{name}")
     else:
@@ -780,6 +827,22 @@ def module_page(name):
         st.markdown(f"<div class='{style}'><b>{heading}</b><br>{result['feedback']}</div>", unsafe_allow_html=True)
         st.write("")
         metrics()
+    st.divider()
+    module_names = list(MODULES)
+    module_index = module_names.index(name)
+    back_target = "Home" if module_index == 0 else module_names[module_index - 1]
+    next_target = "Final Audit" if module_index == len(module_names) - 1 else module_names[module_index + 1]
+    back_col, position_col, next_col = st.columns([1, 1.2, 1])
+    if back_col.button("← Back", key=f"back_{name}", use_container_width=True):
+        st.session_state.current_page = back_target
+        st.rerun()
+    position_col.markdown(
+        f"<p style='text-align:center;margin:.7rem 0 0;color:#525866'>Module {module_index + 1} of {len(module_names)}</p>",
+        unsafe_allow_html=True,
+    )
+    if next_col.button("Next →", key=f"next_{name}", use_container_width=True):
+        st.session_state.current_page = next_target
+        st.rerun()
 
 
 def final_audit():
