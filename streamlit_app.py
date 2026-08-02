@@ -265,14 +265,14 @@ MODULES = {
     },
 }
 
-BASELINE = {"reviewed": 0, "responsible": 0, "risk": 0.0, "readiness": 0.0}
+BASELINE = {"reviewed": 0, "responsible": 0, "readiness": 0.0}
 
 
 def init_state():
-    if st.session_state.get("scoring_version") != 2:
+    if st.session_state.get("scoring_version") != 3:
         for key in list(st.session_state.keys()):
             del st.session_state[key]
-        st.session_state.scoring_version = 2
+        st.session_state.scoring_version = 3
     defaults = {
         "answers": {},
         "completed": [],
@@ -280,7 +280,6 @@ def init_state():
         "completion_celebration": False,
         "reviewed": BASELINE["reviewed"],
         "responsible": BASELINE["responsible"],
-        "risk": BASELINE["risk"],
         "readiness": BASELINE["readiness"],
         "final_audit": None,
         "student_name": "",
@@ -529,16 +528,14 @@ def inject_css():
 
 
 def clamp_metrics():
-    for key in ("risk", "readiness"):
-        st.session_state[key] = max(0, min(100, st.session_state[key]))
+    st.session_state.readiness = max(0, min(100, st.session_state.readiness))
 
 
 def metrics():
-    cols = st.columns(4)
+    cols = st.columns(3)
     cols[0].metric("Modules reviewed", f"{st.session_state.reviewed}/12")
     cols[1].metric("Responsible decisions", f"{st.session_state.responsible}/12")
-    cols[2].metric("Risk exposure", f"{st.session_state.risk:.1f}/100")
-    cols[3].metric("Governance readiness", f"{st.session_state.readiness:.1f}/100")
+    cols[2].metric("Governance readiness", f"{st.session_state.readiness:.1f}/100")
 
 
 def emoji_burst(emojis, include_mascot=False):
@@ -737,9 +734,6 @@ def submit_answer(name, choice):
     if result["correct"]:
         st.session_state.responsible += 1
         st.session_state.readiness += 100 / len(MODULES)
-    else:
-        original_risk = result["delta"][2]
-        st.session_state.risk += 10 if original_risk >= 30 else 5
     clamp_metrics()
     st.session_state.answers[name] = choice
     st.session_state.completed.append(name)
@@ -833,7 +827,6 @@ def report_text():
         "",
         f"Modules reviewed: {st.session_state.reviewed} of {len(MODULES)}",
         f"Responsible decisions: {st.session_state.responsible} of {len(MODULES)}",
-        f"Risk exposure: {st.session_state.risk:.1f}/100",
         f"Governance readiness: {st.session_state.readiness:.1f}/100",
         "",
         "MODULE DECISIONS",
